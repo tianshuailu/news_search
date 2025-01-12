@@ -1,6 +1,6 @@
 import sys
 import io
-from main import get_language, get_topic
+from src.main import get_language, get_topic
 
 def test_get_language():
     # test the get_language function

@@ -11,7 +11,7 @@ def news_api_request(search_term: str, lang: str, page_number: int) -> dict:
     conn = http.client.HTTPSConnection('api.thenewsapi.com')
 
     # add your API token here, you can get it for free at https://www.thenewsapi.com/
-    API_token = "your_api_key"
+    API_token = "Y8VdjfCTRnO32U1rSy2pQJfKvTmaXZK7PtmIvCzS"
     last_month = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
     params = urllib.parse.urlencode({
         'api_token': API_token,
@@ -65,7 +65,7 @@ def model_api_request(model_input: str, getSummary=False, lang='en') -> str:
     })
 
     # add your API key here, you can get it for free at https://www.arliai.com/
-    ARLIAI_API_KEY = "your_api_key"
+    ARLIAI_API_KEY = "2f65bfc7-f1a1-4911-98ea-01f892a6e52b"
 
     headers = {
     'Content-Type': 'application/json',
@@ -119,13 +119,13 @@ def get_keywords(headlines: str, lang: str) -> list:
 def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
 
     search_term = model_api_request(user_input)
-
+    print(f"Searching for news articles on {search_term}...")
     # page_number starts at 1 and increase after each request until we have 15 news articles or there are no more articles
     page_number = 1
 
     # we want to make sure each url returned is valid and can be accessed
     # max_try is the number of times we try the news article url before moving to the next article
-    max_try = 3
+    max_try = 1
 
     result_list = []
     headline_list = []
@@ -143,14 +143,16 @@ def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
             for _ in range(max_try):
                 try:
                     requests.get(news_article['url'], timeout=5)
-                    result_list.append(news_article)
                     headline_list.append(news_article['description'])
+                    news_article = {key: news_article[key] for key in ['title', 'url', 'published_at']}
+                    news_article['published_at'] = news_article['published_at'][:10]
+                    result_list.append(news_article)
                     break
                 except:
                     pass
         
         # Due to the limit of the API, we only get around 30 news articles for each search term
-        if len(result_list) >= 30:
+        if len(result_list) >= 6:
             break
     
     if len(result_list) < 15:
@@ -158,6 +160,7 @@ def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
     else:
         print(f"Here is the top 15 most relevant news articles and a full list of all {len(result_list)} articles have been written to a csv file named {search_term.replace(' ', '')}.csv.")
 
+    """
     df = pd.DataFrame(result_list)
     df = df[['title', 'url', 'published_at']]
     # change the date format to only include the date without the time
@@ -168,11 +171,11 @@ def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
     # print the top 15 news articles
     df = df.head(15)
     print(df.to_string())
-
+    """
     # get the summary of the news headlines
     summary = model_api_request("\n".join(headline_list), getSummary=True)
     
     # get the named entities from the news headlines
     keywords = get_keywords("\n".join(headline_list), lang)
     
-    return summary, keywords
+    return summary, keywords, result_list

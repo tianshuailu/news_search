@@ -1,4 +1,4 @@
-from retrieval import news_api_request, model_api_request, retrieve_news, get_keywords
+from src.retrieval import news_api_request, model_api_request, retrieve_news, get_keywords
 
 def test_news_api_request():
     # test the news_api_request function

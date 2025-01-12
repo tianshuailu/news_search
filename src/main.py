@@ -1,5 +1,6 @@
-from retrieval import retrieve_news
+from src.retrieval import retrieve_news
 
+# to run it in command line, run python -m src.main
 
 def get_language() -> str:
     # Get the language from the user.
