@@ -4,17 +4,21 @@ import pandas as pd
 import requests
 import spacy
 import sys
+import os
 from  datetime import datetime, timedelta
+from dotenv import load_dotenv
 
+# Load the environment variables from .env file
+load_dotenv()
 
 def news_api_request(search_term: str, lang: str, page_number: int) -> dict:
     conn = http.client.HTTPSConnection('api.thenewsapi.com')
 
-    # add your API token here, you can get it for free at https://www.thenewsapi.com/
-    API_token = "Y8VdjfCTRnO32U1rSy2pQJfKvTmaXZK7PtmIvCzS"
+    # create an .env file and add your NEWS_API_KEY there, you can get it for free at https://www.thenewsapi.com/
+    NEWS_API_KEY = os.environ.get('NEWS_API_KEY')
     last_month = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
     params = urllib.parse.urlencode({
-        'api_token': API_token,
+        'api_token': NEWS_API_KEY,
         'search': search_term,
         'language': lang,
         'published_after': last_month,
@@ -65,7 +69,7 @@ def model_api_request(model_input: str, getSummary=False, lang='en') -> str:
     })
 
     # add your API key here, you can get it for free at https://www.arliai.com/
-    ARLIAI_API_KEY = "2f65bfc7-f1a1-4911-98ea-01f892a6e52b"
+    ARLIAI_API_KEY = os.environ.get('ARLIAI_API_KEY')
 
     headers = {
     'Content-Type': 'application/json',
