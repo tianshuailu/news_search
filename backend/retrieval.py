@@ -1,8 +1,6 @@
 import http.client, urllib.parse, urllib.request
 import json
-import pandas as pd
 import requests
-import spacy
 import sys
 import os
 from  datetime import datetime, timedelta
@@ -101,7 +99,7 @@ def model_api_request(model_input: str, getSummary=False, lang='en') -> str:
 
     return search_term
 
-
+"""
 def get_keywords(headlines: str, lang: str) -> list:
     # use spacy for named entity recognition
     # return the keywords
@@ -118,7 +116,7 @@ def get_keywords(headlines: str, lang: str) -> list:
     sorted_counter = sorted(counter.items(), key=lambda pair: pair[1], reverse=True)
     sorted_keywords = [pair[0] for pair in sorted_counter]
     return sorted_keywords
-    
+"""    
 
 def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
 
@@ -180,6 +178,6 @@ def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
     summary = model_api_request("\n".join(headline_list), getSummary=True)
     
     # get the named entities from the news headlines
-    keywords = get_keywords("\n".join(headline_list), lang)
+    # keywords = get_keywords("\n".join(headline_list), lang)
     
-    return summary, keywords, result_list
+    return summary, result_list

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from src.retrieval import retrieve_news
+from backend.retrieval import retrieve_news
 
 app = FastAPI()
 
@@ -23,5 +23,5 @@ async def read_item(item_id: int):
 
 @app.post("/submit")
 async def submit(input: UserInput):
-    summary, keywords, result_list = retrieve_news(input.text, "en")
-    return {"summary": summary, "keywords": keywords, "articles": result_list}
+    summary, result_list = retrieve_news(input.text, "en")
+    return {"summary": summary, "articles": result_list}
