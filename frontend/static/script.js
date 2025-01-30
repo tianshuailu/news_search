@@ -50,7 +50,7 @@ async function fetchNews() {
 
     try {
         //TODO: change the url to the server url later?
-        const response = await fetch('http://localhost:8000/submit', {
+        const response = await fetch('/api/submit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

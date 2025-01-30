@@ -1,16 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: fast-api
+  name: nginx-frontend-ingress
+  namespace: news-search
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: news.search.engine
-      http:
-        paths:
-          - path: /
-            pathType: Exact
-            backend:
-              service:
-                name:  service1
-                port:
-                  number: 80
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-frontend
+            port:
+              number: 8080

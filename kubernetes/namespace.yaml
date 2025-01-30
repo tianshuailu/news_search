@@ -1,0 +1,7 @@
+# kubectl create -f namespace.yaml
+# set the namespace for the current context
+# kubectl config set-context --current --namespace=news-search
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: news-search
