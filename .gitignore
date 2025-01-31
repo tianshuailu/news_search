@@ -3,3 +3,4 @@ src/__pycache__
 .env
 backend/app/tests/
 project_tracker.txt
+handy_commands.sh

@@ -13,7 +13,7 @@ def news_api_request(search_term: str, lang: str, page_number: int) -> dict:
     conn = http.client.HTTPSConnection('api.thenewsapi.com')
 
     # create an .env file and add your NEWS_API_KEY there, you can get it for free at https://www.thenewsapi.com/
-    NEWS_API_KEY = os.environ.get('NEWS_API_KEY')
+    NEWS_API_KEY = os.getenv('NEWS_API_KEY')
     last_month = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
     params = urllib.parse.urlencode({
         'api_token': NEWS_API_KEY,
@@ -67,7 +67,7 @@ def model_api_request(model_input: str, getSummary=False, lang='en') -> str:
     })
 
     # add your API key here, you can get it for free at https://www.arliai.com/
-    ARLIAI_API_KEY = os.environ.get('ARLIAI_API_KEY')
+    ARLIAI_API_KEY = os.getenv('ARLIAI_API_KEY')
 
     headers = {
     'Content-Type': 'application/json',

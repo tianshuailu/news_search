@@ -31,5 +31,14 @@ spec:
       containers:
       - name: nginx-frontend
         image: tianshuailu/news-search-nginx-frontend:0.0.1
+        imagePullPolicy: "Always"
         ports:
         - containerPort: 8080
+        volumeMounts:
+            - mountPath: /etc/nginx/conf.d
+              name: nginx-conf
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: nginx-conf
+          name: nginx-conf
