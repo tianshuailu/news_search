@@ -1,3 +1,19 @@
-# News Search Engine
+# **NewsGlance** – Get the latest news at a glance
 
-The News Search Engine takes user input and searches relevant news articles from the past month. It also allows the user to select the language of the news content.
+## 📰 **Overview**  
+**NewsGlance** is a full-stack web application that allows users to quickly find the latest news on any topic.  
+
+**How it works:**  
+- Users enter a topic into the search bar.  
+- Users get the most recent and relevant news articles.  
+- Plus a cohesive summary combining key points from these articles.  
+
+The app is **containerized with Docker**, orchestrated with **Kubernetes**, and will be **deployed using Terraform** on **AWS/GCP**.
+
+## 🔥 **Tech Stack**
+
+**Frontend:** Bootstrap, nginx, Javascript  
+**Backend:** FastAPI, Python  
+**DevOps:** Docker, Kubernetes, Terraform  
+
+### 📬 [LinkedIn](https://www.linkedin.com/in/tianshuai-lu-ba313221a/)
