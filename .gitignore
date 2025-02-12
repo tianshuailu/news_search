@@ -7,3 +7,4 @@ handy_commands.sh
 run-dev.sh
 terraform/.terraform
 terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
