@@ -14,12 +14,6 @@ on:
     paths:
       - 'terraform/**'
 
-env:
-  TF_CLOUD_ORGANIZATION: "tianlu-terraform-org"
-  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-  TF_WORKSPACE: "news-search"
-  CONFIG_DIRECTORY: "./"
-
 jobs:
   terraform:
     name: "Terraform"
