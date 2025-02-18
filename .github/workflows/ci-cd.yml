@@ -15,6 +15,7 @@ jobs:
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
+      kubernetes: ${{ steps.filter.outputs.kubernetes }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,8 +47,32 @@ jobs:
 
       - name: Build & Push Frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:0.0.1 ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:0.0.1
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ github.ref_name }} ./frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ github.ref_name }}
+
+  deploy-frontend:
+    name: Deploy Frontend
+    needs: build-frontend
+    if: needs.check-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate with GCP
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      
+      - name: Connect to GKE
+        run: |
+          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
+      
+      # use set image to rollout update with the new image
+      - name: Deploy Frontend
+        run: |
+          kubectl set image kubernetes/frontend.yaml nginx-frontend=${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ github.ref_name }} --record
 
   build-backend:
     name: Build & Push Backend Image
@@ -66,5 +91,52 @@ jobs:
 
       - name: Build & Push Backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:0.0.1 ./backend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:0.0.1
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }} ./backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }}
+      
+  deploy-backend:
+    name: Deploy Backend
+    needs: build-backend
+    if: needs.check-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate with GCP
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      
+      - name: Connect to GKE
+        run: |
+          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
+      
+      # use set image to rollout update with the new image
+      - name: Deploy Backend
+        run: |
+          kubectl set image kubernetes/backend.yaml fastapi=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }} --record
+  
+  apply-k8s-config:
+    name: Apply Kubernetes Config
+    needs: check-changes
+    if: needs.check-changes.outputs.kubernetes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate with GCP
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      
+      - name: Connect to GKE
+        run: |
+          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
+      
+      - name: Apply Kubernetes Changes
+        run: |
+          kubectl rollout status kubernetes/
