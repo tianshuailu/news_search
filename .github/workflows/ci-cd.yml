@@ -118,8 +118,8 @@ jobs:
         run: |
           kubectl set image kubernetes/backend.yaml fastapi=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }} --record
   
-  apply-k8s-config:
-    name: Apply Kubernetes Config
+  apply-k8s-changes:
+    name: Apply Kubernetes Changes
     needs: check-changes
     if: needs.check-changes.outputs.kubernetes == 'true'
     runs-on: ubuntu-latest
@@ -137,6 +137,6 @@ jobs:
         run: |
           gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
       
-      - name: Apply Kubernetes Changes
+      - name: Rollout Kubernetes Changes
         run: |
           kubectl rollout status kubernetes/
