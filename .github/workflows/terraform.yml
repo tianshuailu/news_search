@@ -23,7 +23,7 @@ jobs:
       id-token: 'write'
     defaults:
       run:
-        working-directory: terraform/
+        working-directory: ./terraform
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
