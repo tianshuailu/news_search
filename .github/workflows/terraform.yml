@@ -18,7 +18,7 @@ env:
   TF_CLOUD_ORGANIZATION: "tianlu-terraform-org"
   TF_TOKEN_app_terraform_io: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE_app_terraform_io: "news-search"
-  CONFIG_DIRECTORY: "./"
+  CONFIG_DIRECTORY: "./terraform"
 
 jobs:
   terraform:
@@ -56,6 +56,7 @@ jobs:
       
       # PRs trigger terraform plan for review.
       - name: Terraform Plan (PR Review)
+        id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan
         continue-on-error: true
@@ -119,3 +120,8 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
+      
+      # Exit with an error in case the terraform apply command was skipped.
+      - name: Terraform Apply Status
+        if: steps.plan.outcome != 'success'
+        run: exit 1
