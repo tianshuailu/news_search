@@ -14,13 +14,23 @@ on:
     paths:
       - 'terraform/**'
 
+env:
+  TF_CLOUD_ORGANIZATION: "tianlu-terraform-org"
+  TF_TOKEN_app_terraform_io: "${{ secrets.TF_API_TOKEN }}"
+  TF_WORKSPACE_app_terraform_io: "news-search"
+  CONFIG_DIRECTORY: "./"
+
 jobs:
   terraform:
     name: Terraform
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: read
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: ./terraform
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,6 +56,7 @@ jobs:
       
       # PRs trigger terraform plan for review.
       - name: Terraform Plan (PR Review)
+        id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan
         continue-on-error: true
@@ -107,5 +118,15 @@ jobs:
       
       # Apply the Terraform changes when the pull request is approved and merged.
       - name: Terraform Apply
+        id: apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
+      
+      # Trigger the Kubernetes workflow when the Terraform apply is successful.
+      - name: Trigger Kubernetes Workflow
+        if: steps.apply.outcome == 'success'
+        run: |
+          curl -X POST -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/tianshuailu/news_search/dispatches \
+          -d '{"event_type": "trigger-kubernetes-workflow"}'
