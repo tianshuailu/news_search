@@ -14,6 +14,7 @@ The app is **containerized with Docker**, orchestrated with **Kubernetes**, and 
 
 **Frontend:** Bootstrap, nginx, Javascript  
 **Backend:** FastAPI, Python  
-**DevOps:** Docker, Kubernetes, Terraform  
+**DevOps:** Docker, Kubernetes, Terraform
+**CI/CD:** GitHub Actions
 
 ### 📬 [LinkedIn](https://www.linkedin.com/in/tianshuai-lu-ba313221a/)
