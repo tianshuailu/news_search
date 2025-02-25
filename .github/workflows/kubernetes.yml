@@ -1,10 +1,8 @@
 name: Deploy to GKE
 
 on:
-  workflow_run:
-    workflows: ["Terraform Workflow"]
-    types:
-      - completed
+  repository_dispatch:
+    types: [trigger-kubernetes-workflow]
 
 jobs:
   setup-and-deploy:

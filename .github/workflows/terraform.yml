@@ -118,10 +118,15 @@ jobs:
       
       # Apply the Terraform changes when the pull request is approved and merged.
       - name: Terraform Apply
+        id: apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
       
-      # Exit with an error in case the terraform apply command was skipped.
-      - name: Terraform Apply Status
-        if: steps.plan.outcome != 'success'
-        run: exit 1
+      # Trigger the Kubernetes workflow when the Terraform apply is successful.
+      - name: Trigger Kubernetes Workflow
+        if: steps.apply.outcome == 'success'
+        run: |
+          curl -X POST -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/tianshuailu/news_search/dispatches \
+          -d '{"event_type": "trigger-kubernetes-workflow"}'
