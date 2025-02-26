@@ -1,5 +1,7 @@
 name: Deploy to GKE
 
+# trigger the workflow when terraform apply is successful
+# with a repository_dispatch event
 on:
   repository_dispatch:
     types: [trigger-kubernetes-workflow]
@@ -7,7 +9,6 @@ on:
 jobs:
   setup-and-deploy:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'  # Run only if Terraform Workflow succeeded
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
