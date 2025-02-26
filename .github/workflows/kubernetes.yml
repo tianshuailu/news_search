@@ -5,6 +5,11 @@ name: Deploy to GKE
 on:
   repository_dispatch:
     types: [trigger-kubernetes-workflow]
+  push:
+    branches:
+      - test-deployment
+    paths:
+      - '.github/workflows/kubernetes.yml'
 
 jobs:
   setup-and-deploy:
