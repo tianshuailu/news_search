@@ -5,8 +5,11 @@ backend/app/tests/
 project_tracker.txt
 handy_commands.sh
 run-dev.sh
+
 terraform/.terraform
 terraform/.terraform.lock.hcl
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform.tfstate
+
+kubernetes/ingress.yaml

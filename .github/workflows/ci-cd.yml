@@ -65,10 +65,13 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
       
-      - name: Connect to GKE
-        run: |
-          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
-      
+      - name: Get GKE Credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ vars.GCP_GKE_CLUSTER_NAME }}
+          location: ${{ vars.GCP_GKE_CLUSTER_ZONE }}
+          use_dns_based_endpoint: 'true'
+
       # use set image to rollout update with the new image
       - name: Deploy Frontend
         run: |
@@ -109,10 +112,13 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
       
-      - name: Connect to GKE
-        run: |
-          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
-      
+      - name: Get GKE Credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ vars.GCP_GKE_CLUSTER_NAME }}
+          location: ${{ vars.GCP_GKE_CLUSTER_ZONE }}
+          use_dns_based_endpoint: 'true'
+
       # use set image to rollout update with the new image
       - name: Deploy Backend
         run: |
@@ -133,10 +139,13 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
       
-      - name: Connect to GKE
-        run: |
-          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --region ${{ vars.GCP_GKE_CLUSTER_REGION }} --project ${{ vars.GCP_PROJECT_ID }}
-      
+      - name: Get GKE Credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ vars.GCP_GKE_CLUSTER_NAME }}
+          location: ${{ vars.GCP_GKE_CLUSTER_ZONE }}
+          use_dns_based_endpoint: 'true'
+
       - name: Rollout Kubernetes Changes
         run: |
           kubectl rollout status kubernetes/
