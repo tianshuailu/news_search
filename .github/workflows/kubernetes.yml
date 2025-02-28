@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    defaults:
+      run:
+        working-directory: ./kubernetes
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,10 +25,12 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
-      - name: Configure kubectl
-        run: |
-          sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin
-          gcloud container clusters get-credentials ${{ vars.GCP_GKE_CLUSTER_NAME }} --zone ${{ vars.GCP_GKE_CLUSTER_ZONE }} --project ${{ vars.GCP_PROJECT_ID }}
+      - name: Get Credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ vars.GCP_GKE_CLUSTER_NAME }}
+          location: ${{ vars.GCP_GKE_CLUSTER_ZONE }}
+          use_dns_based_endpoint: 'true'
 
       - name: Create Namespace and Configmap
         run: |
@@ -39,4 +44,4 @@ jobs:
           kubectl create secret generic arliai-api --from-literal=arliai-api-key=${{ secrets.ARLIAI_API_KEY }}
 
       - name: Apply Kubernetes manifests
-        run: kubectl apply -f kubernetes/
+        run: kubectl apply -f .
