@@ -124,7 +124,7 @@ jobs:
       # use set image to rollout update with the new image
       - name: Deploy Backend
         run: |
-          kubectl set image deployment/fast-api fastapi=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }} --record --namespace=news-search
+          kubectl set image deployment/fast-api fast-api=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }} --record --namespace=news-search
        
   apply-k8s-changes:
     name: Apply Kubernetes Changes
