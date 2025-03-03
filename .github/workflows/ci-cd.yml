@@ -79,7 +79,7 @@ jobs:
       # use set image to rollout update with the new image
       - name: Deploy Frontend
         run: |
-          kubectl set image deployment/nginx-frontend nginx-frontend=${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ steps.get_tag.outputs.LATEST_TAG }} --record
+          kubectl set image deployment/nginx-frontend nginx-frontend=${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ steps.get_tag.outputs.LATEST_TAG }} --record --namespace=news-search
    
   build-deploy-backend:
     name: Build & Deploy Backend
@@ -124,7 +124,7 @@ jobs:
       # use set image to rollout update with the new image
       - name: Deploy Backend
         run: |
-          kubectl set image deployment/fast-api fastapi=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }} --record
+          kubectl set image deployment/fast-api fastapi=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }} --record --namespace=news-search
        
   apply-k8s-changes:
     name: Apply Kubernetes Changes
@@ -150,4 +150,4 @@ jobs:
 
       - name: Rollout Kubernetes Changes
         run: |
-          kubectl rollout status kubernetes/
+          kubectl rollout status kubernetes/ --namespace=news-search
