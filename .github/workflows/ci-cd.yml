@@ -8,13 +8,14 @@ on:
     branches:
       - main
 
+permissions:
+      contents: read
+      id-token: write
+
 jobs:
   check-changes:
     name: Detect Changes
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
@@ -127,8 +128,8 @@ jobs:
        
   apply-k8s-changes:
     name: Apply Kubernetes Changes
-    needs: check-changes
-    if: needs.check-changes.outputs.kubernetes == 'true'
+    needs: [check-changes, build-deploy-frontend, build-deploy-backend]
+    if: needs.check-changes.outputs.kubernetes == 'true' && needs.build-deploy-frontend.result != 'failure' && needs.build-deploy-backend.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
