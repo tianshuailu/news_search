@@ -92,10 +92,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Get latest tag from dev branch
+      - name: Get latest tag from the current branch
         id: get_tag
         run: |
-          git fetch origin dev --tags
+          git fetch origin ${GITHUB_HEAD_REF} --tags
           latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
           echo "::set-output name=LATEST_TAG::$latest_tag"
 
