@@ -150,4 +150,4 @@ jobs:
 
       - name: Rollout Kubernetes Changes
         run: |
-          kubeclt apply -f kubernetes/ --namespace=news-search
+          kubectl apply -f kubernetes/ --namespace=news-search
