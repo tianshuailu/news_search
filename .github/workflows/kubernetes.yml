@@ -42,6 +42,7 @@ jobs:
         run: |
           kubectl create secret generic news-api --from-literal=news-api-key=${{ secrets.NEWS_API_KEY }}
           kubectl create secret generic arliai-api --from-literal=arliai-api-key=${{ secrets.ARLIAI_API_KEY }}
+          kubectl create secret generic groq-api --from-literal=groq-api-key=${{ secrets.GROQ_API_KEY }}
 
       - name: Apply Kubernetes manifests
         run: kubectl apply -f .

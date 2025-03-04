@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+      contents: read
+      id-token: write
+
 jobs:
   check-changes:
     name: Detect Changes
@@ -29,9 +33,11 @@ jobs:
               - 'frontend/**'
             backend:
               - 'backend/**'
+            kubernetes:
+              - 'kubernetes/**'
 
-  build-frontend:
-    name: Build & Push Frontend Image
+  build-deploy-frontend:
+    name: Build & Deploy Frontend
     needs: check-changes
     if: needs.check-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
@@ -44,21 +50,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Get latest tag from the current branch
+        id: get_tag
+        run: |
+          git fetch origin ${GITHUB_HEAD_REF} --tags
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "::set-output name=LATEST_TAG::$latest_tag"
 
       - name: Build & Push Frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ github.ref_name }} ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ github.ref_name }}
-
-  deploy-frontend:
-    name: Deploy Frontend
-    needs: build-frontend
-    if: needs.check-changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ steps.get_tag.outputs.LATEST_TAG }} ./frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ steps.get_tag.outputs.LATEST_TAG }}
+      
       - name: Authenticate with GCP
         uses: 'google-github-actions/auth@v2'
         with:
@@ -75,10 +79,10 @@ jobs:
       # use set image to rollout update with the new image
       - name: Deploy Frontend
         run: |
-          kubectl set image kubernetes/frontend.yaml nginx-frontend=${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ github.ref_name }} --record
-
-  build-backend:
-    name: Build & Push Backend Image
+          kubectl set image deployment/nginx-frontend nginx-frontend=${{ secrets.DOCKERHUB_USERNAME }}/news-search-nginx-frontend:${{ steps.get_tag.outputs.LATEST_TAG }} --record --namespace=news-search
+   
+  build-deploy-backend:
+    name: Build & Deploy Backend
     needs: check-changes
     if: needs.check-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
@@ -91,21 +95,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Get latest tag from the current branch
+        id: get_tag
+        run: |
+          git fetch origin ${GITHUB_HEAD_REF} --tags
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "::set-output name=LATEST_TAG::$latest_tag"
 
       - name: Build & Push Backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }} ./backend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }} ./backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }}
       
-  deploy-backend:
-    name: Deploy Backend
-    needs: build-backend
-    if: needs.check-changes.outputs.backend == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Authenticate with GCP
         uses: 'google-github-actions/auth@v2'
         with:
@@ -122,12 +124,12 @@ jobs:
       # use set image to rollout update with the new image
       - name: Deploy Backend
         run: |
-          kubectl set image kubernetes/backend.yaml fastapi=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ github.ref_name }} --record
-  
+          kubectl set image deployment/fast-api fast-api=${{ secrets.DOCKERHUB_USERNAME }}/news-search-fastapi:${{ steps.get_tag.outputs.LATEST_TAG }} --record --namespace=news-search
+       
   apply-k8s-changes:
     name: Apply Kubernetes Changes
-    needs: check-changes
-    if: needs.check-changes.outputs.kubernetes == 'true'
+    needs: [check-changes, build-deploy-frontend, build-deploy-backend]
+    if: always() && needs.check-changes.outputs.kubernetes == 'true' && needs.build-deploy-frontend.result != 'failure' && needs.build-deploy-backend.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -148,4 +150,4 @@ jobs:
 
       - name: Rollout Kubernetes Changes
         run: |
-          kubectl rollout status kubernetes/
+          kubectl apply -f kubernetes/ --namespace=news-search

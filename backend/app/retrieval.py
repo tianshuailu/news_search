@@ -5,6 +5,7 @@ import sys
 import os
 from  datetime import datetime, timedelta
 from dotenv import load_dotenv
+from groq import Groq
 
 # Load the environment variables from .env file
 load_dotenv()
@@ -38,6 +39,41 @@ def news_api_request(search_term: str, lang: str, page_number: int) -> dict:
     json_data = json.loads(news_data)
 
     return json_data
+
+def groq_api_request(model_input: str, getSummary=False, lang='en') -> str:
+    # if getSummary is True, model input is headlines, else it is the user input
+    lang = 'English' if lang == 'en' else 'German'
+    if getSummary:
+        systemPrompt = f"You are a helpful assistant. You will summarize the following news headlines with no more than 3 sentences. You will only reply with the summary in {lang}."
+    else:
+        systemPrompt = f"You are a helpful assistant. You will summarize the user input with no more than 3 keywords. You will only reply with the keywords in {lang}."
+    
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
+
+    request = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": systemPrompt,
+            },
+            {
+                "role": "user",
+                "content": model_input,
+            }
+        ],
+        model="llama-3.3-70b-versatile",
+    )
+
+    output = request.choices[0].message.content
+    if getSummary:
+        return output
+    
+    # concatenate the keywords with a "+" sign to match the url format
+    search_term = " + ".join(output.split(" "))
+
+    return search_term
 
 
 def model_api_request(model_input: str, getSummary=False, lang='en') -> str:
@@ -120,7 +156,11 @@ def get_keywords(headlines: str, lang: str) -> list:
 
 def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
 
-    search_term = model_api_request(user_input)
+    #search_term = model_api_request(user_input)
+    
+    # Use the GROQ API to get the search term
+    search_term = groq_api_request(user_input)
+    
     print(f"Searching for news articles on {search_term}...")
     # page_number starts at 1 and increase after each request until we have 15 news articles or there are no more articles
     page_number = 1
@@ -175,7 +215,10 @@ def retrieve_news(user_input: str, lang: str) -> tuple[str, list]:
     print(df.to_string())
     """
     # get the summary of the news headlines
-    summary = model_api_request("\n".join(headline_list), getSummary=True)
+    #summary = model_api_request("\n".join(headline_list), getSummary=True)
+
+    # Use the GROQ API to get the summary
+    summary = groq_api_request("\n".join(headline_list), getSummary=True)
     
     # get the named entities from the news headlines
     # keywords = get_keywords("\n".join(headline_list), lang)
