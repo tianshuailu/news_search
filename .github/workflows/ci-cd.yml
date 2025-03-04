@@ -129,7 +129,7 @@ jobs:
   apply-k8s-changes:
     name: Apply Kubernetes Changes
     needs: [check-changes, build-deploy-frontend, build-deploy-backend]
-    if: needs.check-changes.outputs.kubernetes == 'true' && needs.build-deploy-frontend.result != 'failure' && needs.build-deploy-backend.result != 'failure'
+    if: always() && needs.check-changes.outputs.kubernetes == 'true' && needs.build-deploy-frontend.result != 'failure' && needs.build-deploy-backend.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
