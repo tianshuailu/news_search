@@ -8,12 +8,12 @@
 - Users get the most recent and relevant news articles.  
 - Plus a cohesive summary combining key points from these articles.  
 
-The app is **containerized with Docker**, orchestrated with **Kubernetes**, and will be **deployed using Terraform** on **AWS/GCP**.
+The app is containerized with **Docker**, orchestrated with **Kubernetes**, and is deployed using **Terraform** on GKE clusters from **Google Cloud Platform (GCP)**.
 
 ## 🔥 **Tech Stack**
 
 **Frontend:** Bootstrap, nginx, Javascript  
-**Backend:** FastAPI, Python  
+**Backend:** FastAPI, Python, LLM API  
 **DevOps:** Docker, Kubernetes, Terraform  
 **CI/CD:** GitHub Actions
 
