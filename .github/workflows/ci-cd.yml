@@ -150,5 +150,4 @@ jobs:
 
       - name: Rollout Kubernetes Changes
         run: |
-          kubectl rollout status deployment/fast-api --namespace=news-search
-          kubectl rollout status deployment/nginx-frontend --namespace=news-search
+          kubectl rollout status -f kubernetes/ --recursive --namespace=news-search
