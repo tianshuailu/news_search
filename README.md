@@ -1,7 +1,7 @@
-# **NewsGlance** – Get the latest news at a glance
+# **News Search** – Get the latest news at a glance
 
 ## 📰 **Overview**  
-[**NewsGlance**](http://34.147.77.24:8080/) is a full-stack web application that allows users to quickly find the latest news on any topic.  
+[**News Search**](http://34.147.77.24:8080/) is a full-stack web application that allows users to quickly find the latest news on any topic.  
 
 **How it works:**  
 - Users enter a topic into the search bar.  
