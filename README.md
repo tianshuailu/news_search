@@ -7,6 +7,7 @@
 - Users enter a topic into the search bar.  
 - Users get the most recent and relevant news articles.  
 - Plus a cohesive summary combining key points from these articles.  
+- Chatbot that answers any question on found articles (In progress).  
 
 The app is containerized with **Docker**, orchestrated with **Kubernetes**, and is deployed using **Terraform** on GKE clusters from **Google Cloud Platform (GCP)**.
 
