@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: fast-api
-        image: tianshuailu/news-search-fastapi:0.0.1
+        image: tianshuailu/news-search-fastapi:latest
         ports:
         - containerPort: 8000
         env:

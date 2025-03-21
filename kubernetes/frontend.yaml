@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: nginx-frontend
-        image: tianshuailu/news-search-nginx-frontend:0.0.1
+        image: tianshuailu/news-search-nginx-frontend:latest
         imagePullPolicy: "Always"
         ports:
         - containerPort: 8080
