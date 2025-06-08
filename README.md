@@ -3,7 +3,7 @@
 # **News Search** – Get the latest news at a glance
 
 ## 📰 **Overview**  
-[**News Search**](http://34.13.214.88:8080/) is a full-stack web application that allows users to quickly find the latest news on any topic.  
+**News Search** is a full-stack web application that allows users to quickly find the latest news on any topic.  
 
 **How it works:**  
 - Users enter a topic into the search bar.  
@@ -11,7 +11,7 @@
 - Plus a cohesive summary combining key points from these articles.  
 - Chatbot that answers any question on found articles (In progress).  
 
-The app is containerized with **Docker**, orchestrated with **Kubernetes**, and is deployed using **Terraform** on GKE clusters from **Google Cloud Platform (GCP)**.
+The app was containerized with **Docker**, orchestrated with **Kubernetes**, and was deployed using **Terraform** on GKE clusters from **Google Cloud Platform (GCP)**.
 
 ## 🔥 **Tech Stack**
 
